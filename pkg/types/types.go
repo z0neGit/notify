@@ -19,4 +19,9 @@ type Options struct {
 	Bulk      bool   `yaml:"bulk,omitempty"`
 	CharLimit int    `yaml:"char_limit,omitempty"`
 	Data      string `yaml:"data,omitempty"`
+
+	// forwarding mode
+	Forwarding bool
+	Listen     string
+	AuthToken  string
 }

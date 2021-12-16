@@ -63,6 +63,9 @@ func readConfig() {
 	set.BoolVar(&options.Version, "version", false, "display version")
 	set.BoolVarP(&options.NoColor, "no-color", "nc", false, "disable colors in output")
 	set.StringVar(&options.Proxy, "proxy", "", "HTTP Proxy to use with notify")
+	set.BoolVarP(&options.Forwarding, "forwarding", "f", false, "forwarding mode")
+	set.StringVarP(&options.Listen, "listen", "l", "127.0.0.1:8080", "listen ip and port")
+	set.StringVarP(&options.AuthToken, "token", "at", "", "forwarding mode auth token")
 
 	_ = set.Parse()
 

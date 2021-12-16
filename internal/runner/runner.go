@@ -83,6 +83,7 @@ func (r *Runner) Run() error {
 
 	var inFile *os.File
 	var err error
+	var msgChan chan string
 
 	switch {
 	case r.options.Data != "":
@@ -95,7 +96,14 @@ func (r *Runner) Run() error {
 			gologger.Error().Msgf("bulk flag is not supported with stdin")
 			os.Exit(1)
 		}
-		inFile = os.Stdin
+		//inFile = os.Stdin
+	case r.options.Forwarding:
+		if r.options.Bulk {
+			gologger.Error().Msgf("bulk flag is not supported with Forwarding")
+			os.Exit(1)
+		}
+		msgChan = make(chan string, 10)
+		startForwarding(r.options.Listen, msgChan, r.options.AuthToken)
 	default:
 		return errors.New("notify works with stdin or file using -data flag")
 	}
@@ -130,12 +138,18 @@ func (r *Runner) Run() error {
 		os.Exit(0)
 	}
 
-	br := bufio.NewScanner(inFile)
-	for br.Scan() {
-		msg := br.Text()
-		//nolint:errcheck
-		r.sendMessage(msg)
+	if r.options.Forwarding {
+		for msg := range msgChan {
+			r.sendMessage(msg)
+		}
+	} else {
+		br := bufio.NewScanner(inFile)
+		for br.Scan() {
+			msg := br.Text()
+			//nolint:errcheck
+			r.sendMessage(msg)
 
+		}
 	}
 	return nil
 }
